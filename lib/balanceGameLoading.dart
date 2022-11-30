@@ -16,6 +16,7 @@ class _BalanceGameLoading extends State<BalanceGameLoading> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 4), () {
+      Navigator.pop(context);
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -27,6 +28,7 @@ class _BalanceGameLoading extends State<BalanceGameLoading> {
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: gray,

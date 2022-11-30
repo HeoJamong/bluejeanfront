@@ -1,20 +1,7 @@
-import 'package:blue_jeans/balanceGame.dart';
-import 'package:blue_jeans/balanceGameLoading.dart';
-import 'package:blue_jeans/circulatingBombGame.dart';
-import 'package:blue_jeans/circulatingBombGameLoading.dart';
-import 'package:blue_jeans/penaltyScreen.dart';
-import 'package:blue_jeans/resultScreen.dart';
-import 'package:blue_jeans/touchGame.dart';
-import 'package:blue_jeans/touchGameLoading.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
-// import 'package:blue_jeans/gatchaScreen.dart';
 import 'package:blue_jeans/loading.dart';
-// import 'package:blue_jeans/penaltyScreen.dart';
 import 'package:blue_jeans/popup_screen.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:blue_jeans/touchGame.dart';
 
 const background = Color.fromARGB(255, 1, 125, 125);
 const gray = Color.fromRGBO(192, 192, 192, 1);
@@ -23,22 +10,6 @@ void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LoadingScreen(),
     ));
-
-// class Bgm {
-//   Future<void> loadAssets() async {
-//     await FlameAudio.bgm.("bgm.mp3");
-//   }
-
-//   void playBgm() {
-//     FlameAudio.bgm.play('bgm.mp3');
-//   }
-
-//   void stopBgm() {
-//     FlameAudio.bgm.resume();
-//   }
-// }
-
-// Bgm bgm = Bgm();
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});

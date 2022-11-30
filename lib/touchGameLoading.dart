@@ -16,6 +16,7 @@ class _TouchGameLoading extends State<TouchGameLoading> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 4), () {
+      Navigator.pop(context);
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -27,6 +28,7 @@ class _TouchGameLoading extends State<TouchGameLoading> {
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: gray,

@@ -18,6 +18,7 @@ class _CirculatingBombGameLoading extends State<CirculatingBombGameLoading> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 4), () {
+      Navigator.pop(context);
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -29,6 +30,7 @@ class _CirculatingBombGameLoading extends State<CirculatingBombGameLoading> {
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: gray,
