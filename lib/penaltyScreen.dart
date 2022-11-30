@@ -32,14 +32,14 @@ class DrawResult extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                            socket.penalty, //여기에 벌칙 가지고 와야함
+                            socket.penalty,
                             style: TextStyle(
                               fontSize: 20,
                               fontFamily: 'Retro',
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 10, top: 354),
+                            padding: const EdgeInsets.only(left: 10, top: 420),
                             child: InkWell(
                               onTap: (() {
                                 Navigator.pop(context);

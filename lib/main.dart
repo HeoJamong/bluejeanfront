@@ -1,4 +1,3 @@
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:blue_jeans/loading.dart';
 import 'package:blue_jeans/popup_screen.dart';
@@ -16,11 +15,6 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // bgm.loadAssets();
-    // bgm.playBgm();
-    FlameAudio.bgm.initialize();
-    FlameAudio.bgm.dispose();
-    FlameAudio.bgm.play("bgm.mp3");
     return Scaffold(
       backgroundColor: gray,
       body: SafeArea(

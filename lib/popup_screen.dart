@@ -260,44 +260,108 @@ class roomIdErrorScreen extends StatelessWidget {
   }
 }
 
-class OptionScreen extends StatelessWidget {
+class OptionScreen extends StatefulWidget {
   const OptionScreen({super.key});
 
   @override
+  State<OptionScreen> createState() => _OptionScreenState();
+}
+
+class _OptionScreenState extends State<OptionScreen> {
+  bool isBgmOnOff = false;
+  bool isEffOnOff = false;
+  late List<bool> isBgmSelected;
+  late List<bool> isEffSelected;
+
+  @override
+  void initState() {
+    isBgmSelected = [true, false];
+    isEffSelected = [true, false];
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    FlameAudio.bgm.stop();
     return Container(
       decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage('assets/option.png'), fit: BoxFit.fill)),
       child: Column(children: [
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 200.0),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Image.asset('assets/closeButton.png'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 400.0),
-              child: SizedBox(
-                height: 80,
-                width: 150,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Image.asset(
-                    'assets/confirmButton.png',
-                  ),
+        Padding(
+          padding: const EdgeInsets.only(left: 200.0),
+          child: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Image.asset('assets/closeButton.png'),
+          ),
+        ),
+        ToggleButtons(
+            isSelected: isBgmSelected,
+            onPressed: (index) {
+              setState(() {
+                isBgmSelected[index] = !isBgmSelected[index];
+                if (isBgmSelected[index]) {
+                  FlameAudio.bgm.initialize();
+                } else {
+                  FlameAudio.bgm.dispose();
+                }
+              });
+            },
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Icon(
+                  Icons.volume_up,
+                  size: 20,
                 ),
               ),
-            )
-          ],
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Icon(
+                  Icons.volume_off,
+                  size: 20,
+                ),
+              )
+            ]),
+        ToggleButtons(
+            isSelected: isEffSelected,
+            onPressed: (index) {
+              setState(() {
+                isEffSelected[index] = !isEffSelected[index];
+                print('효과음: $isEffOnOff');
+              });
+            },
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Icon(
+                  Icons.volume_up,
+                  size: 20,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Icon(
+                  Icons.volume_off,
+                  size: 20,
+                ),
+              )
+            ]),
+        Padding(
+          padding: const EdgeInsets.only(top: 400.0),
+          child: SizedBox(
+            height: 80,
+            width: 150,
+            child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Image.asset(
+                'assets/confirmButton.png',
+              ),
+            ),
+          ),
         )
       ]),
     );
