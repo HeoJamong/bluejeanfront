@@ -24,24 +24,35 @@ class GatchaScreen extends StatelessWidget {
                   image: DecorationImage(
                       image: AssetImage('assets/gatchaScreen.png'),
                       fit: BoxFit.fill)),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 500),
-                child: InkWell(
-                  child: Image.asset(
-                    'assets/gatchaButton.png',
-                    height: 250,
-                    width: 150,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 200.0),
+                    child: Text(
+                      "data",
+                      style: TextStyle(fontSize: 28, fontFamily: "Retro"),
+                    ),
                   ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PenaltyGatcha(
-                                  socket: socket,
-                                )));
-                  },
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 260),
+                    child: InkWell(
+                      child: Image.asset(
+                        'assets/gatchaButton.png',
+                        height: 250,
+                        width: 150,
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PenaltyGatcha(
+                                      socket: socket,
+                                    )));
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

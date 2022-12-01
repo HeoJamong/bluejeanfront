@@ -1,16 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:blue_jeans/main.dart';
+
 import 'package:blue_jeans/socketIoClnt.dart';
 import 'package:blue_jeans/userClass.dart';
 import 'package:blue_jeans/waitingRoom.dart';
-import 'package:blue_jeans/resultScreen.dart';
-import 'package:blue_jeans/touchGame.dart';
 
 //ClientSocket socket = ClientSocket();
 
@@ -18,6 +14,14 @@ String randomRoomId() {
   var random = Random();
   dynamic val = List<int>.generate(6, (i) => random.nextInt(247));
   return base64UrlEncode(val);
+}
+
+void emftyRoomIdError(BuildContext context) {
+  var dialog = Dialog(child: EmftyRoomIdErrorScreen());
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => dialog);
 }
 
 void fullRoomError(BuildContext context) {
@@ -29,7 +33,15 @@ void fullRoomError(BuildContext context) {
 }
 
 void roomIdError(BuildContext context) {
-  var dialog = Dialog(child: roomIdErrorScreen());
+  var dialog = Dialog(child: RoomIdErrorScreen());
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => dialog);
+}
+
+void emptyNicknameError(BuildContext context) {
+  var dialog = Dialog(child: EmptyNicknameError());
   showDialog(
       context: context,
       barrierDismissible: false,
@@ -37,7 +49,7 @@ void roomIdError(BuildContext context) {
 }
 
 void nicknameError(BuildContext context) {
-  var dialog = Dialog(child: nicknameErrorScreen());
+  var dialog = Dialog(child: NicknameErrorScreen());
   showDialog(
       context: context,
       barrierDismissible: false,
@@ -187,7 +199,44 @@ class _ShowHelpScreen extends State<ShowHelpScreen> {
   }
 }
 
-class nicknameErrorScreen extends StatelessWidget {
+class EmptyNicknameError extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Container(
+      height: 300,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/error.png'), fit: BoxFit.fill)),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 220.0),
+            child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Image.asset('assets/closeButton.png'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 100.0),
+            child: Container(
+              child: Padding(
+                  padding: const EdgeInsets.only(top: 70),
+                  child: Text(
+                    "별명이 입력되지 않았습니다.",
+                    style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+                  )),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NicknameErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -224,7 +273,43 @@ class nicknameErrorScreen extends StatelessWidget {
   }
 }
 
-class roomIdErrorScreen extends StatelessWidget {
+class EmftyRoomIdErrorScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 300,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/error.png'), fit: BoxFit.fill)),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 220.0),
+            child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Image.asset('assets/closeButton.png'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 100.0),
+            child: Container(
+              child: Padding(
+                  padding: const EdgeInsets.only(top: 70),
+                  child: Text(
+                    "방코드가 입력되지 않았습니다.",
+                    style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+                  )),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RoomIdErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(

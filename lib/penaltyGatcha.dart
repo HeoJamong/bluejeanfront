@@ -12,7 +12,6 @@ import 'package:blue_jeans/resultScreen.dart';
 
 class PenaltyGatcha extends StatelessWidget {
   final ClientSocket socket;
-  var Myimg = "assets/penalty.gif";
 
   PenaltyGatcha({super.key, required this.socket});
 
