@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:flame_audio/flame_audio.dart';
-
+import 'package:blue_jeans/waitingRoom.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flame_audio/flame_audio.dart';
 import 'package:blue_jeans/socketIoClnt.dart';
 import 'package:blue_jeans/userClass.dart';
-import 'package:blue_jeans/waitingRoom.dart';
 
-//ClientSocket socket = ClientSocket();
+const String nameEmptyErrMsg = '닉네임을 입력하세요.';
+const String roomIdEmptyErrMsg = '방 코드를 입력하세요.';
 
 String randomRoomId() {
   var random = Random();
@@ -84,6 +83,7 @@ class _ShowHelpScreen extends State<ShowHelpScreen> {
     "폭탄 게임은 제한시간이 종료 되엇을 때 폭탄을 보유하고 있는 참가자가 패배하는 게임입니다. 폭탄을 가진 사람은 넘기기 버튼을 눌러 다른 사람에게 폭탄을 넘길 수 있고 폭탄이 터진 사람은 벌칙을 받게 됩니다.",
     "탈락한 사람들은 벌칙을 뽑아 나온 벌칙을 뽑아 나온 벌칙을 수행하게 됩니다. 행운을 빌어요"
   ];
+
   void nextHelp() {
     if (cnt < helpContent.length) {
       setState(() {
@@ -187,7 +187,9 @@ class _ShowHelpScreen extends State<ShowHelpScreen> {
 
 class ErrorScreen extends StatelessWidget {
   final String errorMsg;
+
   ErrorScreen({super.key, required this.errorMsg});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -208,17 +210,15 @@ class ErrorScreen extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 100.0),
-            child: Container(
-              child: Padding(
-                  padding: const EdgeInsets.only(top: 70),
-                  child: Text(
-                    errorMsg,
-                    style: TextStyle(
-                        fontSize: 27,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Retro"),
-                  )),
-            ),
+            child: Padding(
+                padding: const EdgeInsets.only(top: 70),
+                child: Text(
+                  errorMsg,
+                  style: TextStyle(
+                      fontSize: 27,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Retro"),
+                )),
           ),
         ],
       ),
@@ -234,27 +234,17 @@ class OptionScreen extends StatefulWidget {
 }
 
 class _OptionScreenState extends State<OptionScreen> {
-  bool isBgmOnOff = false;
-  bool isEffOnOff = false;
-  late List<bool> isBgmSelected;
-  late List<bool> isEffSelected;
-
-  @override
-  void initState() {
-    isBgmSelected = [true, false];
-    isEffSelected = [true, false];
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 600,
+      width: 400,
       decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage('assets/option.png'), fit: BoxFit.fill)),
       child: Column(children: [
         Padding(
-          padding: const EdgeInsets.only(left: 200.0),
+          padding: const EdgeInsets.only(left: 240.0),
           child: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -262,60 +252,72 @@ class _OptionScreenState extends State<OptionScreen> {
             icon: Image.asset('assets/closeButton.png'),
           ),
         ),
-        ToggleButtons(
-            isSelected: isBgmSelected,
-            onPressed: (index) {
-              setState(() {
-                isBgmSelected[index] = !isBgmSelected[index];
-                if (isBgmSelected[index]) {
-                  FlameAudio.bgm.initialize();
-                } else {
+        SizedBox(
+          height: 78,
+        ),
+        Row(
+          children: [
+            Spacer(
+              flex: 9,
+            ),
+            Flexible(
+              flex: 3,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: gray,
+                    shape: BeveledRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                        side: BorderSide(
+                            width: 1,
+                            color: Colors.black,
+                            strokeAlign: StrokeAlign.outside))),
+                onPressed: () {
                   FlameAudio.bgm.dispose();
-                }
-              });
-            },
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Icon(
-                  Icons.volume_up,
-                  size: 20,
+                  FlameAudio.bgm.play("bgm.mp3");
+                },
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: Icon(
+                      Icons.volume_up,
+                      size: 20,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Icon(
-                  Icons.volume_off,
-                  size: 20,
-                ),
-              )
-            ]),
-        ToggleButtons(
-            isSelected: isEffSelected,
-            onPressed: (index) {
-              setState(() {
-                isEffSelected[index] = !isEffSelected[index];
-                print('효과음: $isEffOnOff');
-              });
-            },
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Icon(
-                  Icons.volume_up,
-                  size: 20,
+            ),
+            Flexible(
+              flex: 3,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: gray,
+                    shape: BeveledRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                        side: BorderSide(
+                            width: 1, strokeAlign: StrokeAlign.outside))),
+                onPressed: () {
+                  FlameAudio.bgm.dispose();
+                },
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: Icon(
+                      Icons.volume_off,
+                      size: 20,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Icon(
-                  Icons.volume_off,
-                  size: 20,
-                ),
-              )
-            ]),
+            ),
+            Spacer(
+              flex: 1,
+            )
+          ],
+        ),
         Padding(
-          padding: const EdgeInsets.only(top: 400.0),
+          padding: const EdgeInsets.only(top: 200.0),
           child: SizedBox(
             height: 80,
             width: 150,
@@ -404,20 +406,14 @@ class CreateRoomScreenState extends State<CreateRoomScreen> {
                       ),
                       onTap: () {
                         nickname = nicknameTEC.text;
-                        String roomId = randomRoomId();
-
-                        var data = User(name: nickname, roomId: roomId);
-                        ClientSocket socket = ClientSocket(context);
-                        socket.creatingRoomReq(data);
-
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => WaitingRoom(
-                                      roomId: roomId,
-                                      websocket: socket,
-                                      isCaptain: true,
-                                    )));
+                        if (nickname == '') {
+                          errorScreen(context, nameEmptyErrMsg);
+                        } else {
+                          String roomId = randomRoomId();
+                          var data = User(name: nickname, roomId: roomId);
+                          ClientSocket socket = ClientSocket(context);
+                          socket.creatingRoomReq(data);
+                        }
                       })),
               Spacer(
                 flex: 2,
@@ -557,17 +553,15 @@ class JoinRoomScreenState extends State<JoinRoomScreen> {
                       onTap: () {
                         nickname = nicknameTEC.text;
                         roomId = roomIdTEC.text;
-                        var data = User(name: nickname, roomId: roomId);
-                        ClientSocket socket = ClientSocket(context);
-                        socket.joiningRoomReq(data);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => WaitingRoom(
-                                      roomId: roomId,
-                                      websocket: socket,
-                                      isCaptain: false,
-                                    )));
+                        if (nickname == '') {
+                          errorScreen(context, nameEmptyErrMsg);
+                        } else if (roomId == '') {
+                          errorScreen(context, roomIdEmptyErrMsg);
+                        } else {
+                          var data = User(name: nickname, roomId: roomId);
+                          ClientSocket socket = ClientSocket(context);
+                          socket.joiningRoomReq(data);
+                        }
                       })),
             )
           ])),

@@ -257,7 +257,7 @@ class WaitingRoomState extends State<WaitingRoom> {
                                 color: Colors.black),
                           ),
                           onPressed: () {
-                            widget.websocket.disconnect();
+                            widget.websocket.exitRoomReq();
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(

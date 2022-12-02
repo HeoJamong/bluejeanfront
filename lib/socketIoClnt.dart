@@ -1,20 +1,19 @@
-import 'package:blue_jeans/balanceGameLoading.dart';
-import 'package:blue_jeans/circulatingBombGameLoading.dart';
-import 'package:blue_jeans/touchGameLoading.dart';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart';
-
-import 'package:blue_jeans/userClass.dart';
 import 'package:blue_jeans/popup_screen.dart';
-import 'package:blue_jeans/touchGame.dart';
-import 'package:blue_jeans/circulatingBombGame.dart';
-import 'package:blue_jeans/balanceGame.dart';
+import 'package:blue_jeans/userClass.dart';
+import 'package:blue_jeans/waitingRoom.dart';
+import 'package:blue_jeans/touchGameLoading.dart';
+import 'package:blue_jeans/circulatingBombGameLoading.dart';
+import 'package:blue_jeans/balanceGameLoading.dart';
 import 'package:blue_jeans/resultScreen.dart';
 
 String JOIN_TITLE = 'join';
 String CREATE_TITLE = 'create';
 String DISCONNECT_TITLE = 'disconnect';
 String START_TITLE = 'start';
+
+typedef VoidCallback = void Function();
 
 class ClientSocket with ChangeNotifier {
   ClientSocket(this.context) {
@@ -27,6 +26,10 @@ class ClientSocket with ChangeNotifier {
   late List<dynamic> userList = [''];
   late String myName = '';
   late var game = 0;
+  late bool isCaptain = false;
+
+  //서버 에러 메세지 저장
+  String errorMsg = 'Unknown Err :(';
 
   //밸런스게임 선택지 저장
   late List options = ['', ''];
@@ -54,17 +57,6 @@ class ClientSocket with ChangeNotifier {
       'transports': ['websocket'],
       'forceNew': 'false',
     });
-    // print("clntSocket : ${clntSocket.hashCode}");
-  }
-
-  //소켓 연결 해제
-  void disconnect() {
-    clntSocket.off(JOIN_TITLE);
-    clntSocket.off(CREATE_TITLE);
-
-    clntSocket.dispose();
-    print('disconnected');
-    super.dispose();
   }
 
   //방 참가시 동작 - 방 접속 요청 전송, 방에 접속한 유저 리스트 갱신받음
@@ -80,32 +72,34 @@ class ClientSocket with ChangeNotifier {
     //방 참가 응답 및 유저 리스트 갱신
     clntSocket.on(JOIN_TITLE, (response) {
       if (response['state'] == '200') {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => WaitingRoom(
+                      roomId: json.roomId,
+                      websocket: this,
+                      isCaptain: false,
+                    )));
         userList = response['users'];
         print('updated userList : $userList');
         notifyListeners();
       }
-      //정원 초과
-      else if (response['state'] == '-100') {
-        Navigator.pop(context);
-        fullRoomError(context);
-      }
-      //닉네임 중복
-      else if (response['state'] == '-101') {
-        Navigator.pop(context);
-        nicknameError(context);
-      }
-      //방 존재 X
-      else if (response['state'] == '-102') {
-        Navigator.pop(context);
-        roomIdError(context);
+      //방 참가 에러
+      else {
+        errorMsg = response['msg'];
+        errorScreen(context, errorMsg);
+        clntSocket.off(JOIN_TITLE);
+        errorMsg = 'Unknown Err :(';
       }
     });
 
     //게임 시작 응답
     clntSocket.on(START_TITLE, (response) {
-      print('gameType = ${response['gameType']}');
-      print('gameType = ${response['gameType'].runtimeType}');
-      game = response['gameType'];
+      if (response['gameType'] == String) {
+        game = int.parse(response['gameType']);
+      } else {
+        game = response['gameType'];
+      }
       _gameResponseListener(response['gameType']);
       print('Game Started.');
     });
@@ -123,9 +117,23 @@ class ClientSocket with ChangeNotifier {
     //방 생성 응답
     clntSocket.on(CREATE_TITLE, (response) {
       if (response['state'] == '200') {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => WaitingRoom(
+                      roomId: json.roomId,
+                      websocket: this,
+                      isCaptain: true,
+                    )));
         print("Room Created Successfully!");
         userList[0] = json.name;
+        isCaptain = true;
         notifyListeners();
+      } else {
+        errorMsg = response['msg'];
+        errorScreen(context, errorMsg);
+        clntSocket.off(CREATE_TITLE);
+        errorMsg = 'Unknown Err :(';
       }
     });
 
@@ -140,8 +148,6 @@ class ClientSocket with ChangeNotifier {
 
     //게임 시작 응답
     clntSocket.on(START_TITLE, (response) {
-      print('gameType = ${response['gameType']}');
-      print('gameType = ${response['gameType'].runtimeType}');
       if (response['gameType'] == String) {
         game = int.parse(response['gameType']);
       } else {
@@ -150,6 +156,15 @@ class ClientSocket with ChangeNotifier {
       _gameResponseListener(response['gameType']);
       print('Game Started.');
     });
+  }
+
+  //방 나가기 동작 - 서버에게 참가한 방을 나간다는 요청 전송
+  void exitRoomReq() {
+    isCaptain = false;
+    clntSocket.emit('exit');
+    clntSocket.off(JOIN_TITLE);
+    clntSocket.off(CREATE_TITLE);
+    clntSocket.off(START_TITLE);
   }
 
   //방장이 서버로 보내는 게임 시작 요청
@@ -171,8 +186,6 @@ class ClientSocket with ChangeNotifier {
     else if (gameType == 2) {
       clntSocket.emit('bombGame');
       clntSocket.on('bombGame', (response) {
-        print(response['users']); //List<dynamic>
-        print(response['index']); //int
         bombUserList = response['users'];
         bombIndex = response['index'];
         myIndex = findMyIndex();
@@ -186,10 +199,11 @@ class ClientSocket with ChangeNotifier {
     }
     //밸런스 게임 시작
     else if (gameType == 3) {
-      clntSocket.emit('options');
+      if (isCaptain) {
+        clntSocket.emit('options');
+      }
       clntSocket.on('options', (response) {
         //밸런스게임 선택지 받기
-        print(response);
         options = response['option'];
         notifyListeners();
       });
@@ -204,11 +218,8 @@ class ClientSocket with ChangeNotifier {
   //터치 게임 결과 전송 및 응답
   void touchGameResult(int myResult) {
     clntSocket.emit('touchGame', {'touchCount': myResult});
-
+    print('Touch Game Ended');
     clntSocket.on('touchGameResult', (response) {
-      print('losers : ${response['losers']}');
-      print('penalty : ${response['penalty']}');
-      print('score : ${response['score']}');
       if (response['losers'].runtimeType == String) {
         loserStr = response['losers'];
       } else {
@@ -221,7 +232,6 @@ class ClientSocket with ChangeNotifier {
           }
         }
       }
-      print('loserStr : $loserStr');
       penalty = response['penalty'];
       score = response['score'];
 
@@ -254,8 +264,6 @@ class ClientSocket with ChangeNotifier {
           MaterialPageRoute(
             builder: (context) => ResultScreen(socket: this),
           ));
-      print('losers : ${response['losers']}');
-      print('penalty : ${response['penalty']}');
       if (response['losers'].runtimeType == String) {
         loserStr = response['losers'];
       } else {
@@ -268,7 +276,6 @@ class ClientSocket with ChangeNotifier {
           }
         }
       }
-      print('loserStr : $loserStr');
       penalty = response['penalty'];
 
       notifyListeners();
@@ -277,12 +284,8 @@ class ClientSocket with ChangeNotifier {
 
   void balanceGameResult(String myOption) {
     clntSocket.emit('balanceGame', {'option': myOption});
-
+    print('Balance Game Ended');
     clntSocket.on('balanceGameResult', (response) {
-      print('losers : ${response['losers']}');
-      print('penalty : ${response['penalty']}');
-      print('score : ${response['score']}');
-
       if (response['losers'].runtimeType == String) {
         loserStr = response['losers'];
       } else {
@@ -295,7 +298,6 @@ class ClientSocket with ChangeNotifier {
           }
         }
       }
-      print('loserStr : $loserStr');
       penalty = response['penalty'];
       score = response['score'];
 

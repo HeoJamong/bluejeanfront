@@ -1,15 +1,19 @@
-import 'package:blue_jeans/socketIoClnt.dart';
-import 'package:blue_jeans/waitingRoom.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:blue_jeans/main.dart' as main;
+import 'package:blue_jeans/socketIoClnt.dart';
 import 'package:blue_jeans/penaltyGatcha.dart';
-import 'package:blue_jeans/resultScreen.dart';
 
-class GatchaScreen extends StatelessWidget {
+class GatchaScreen extends StatefulWidget {
   final ClientSocket socket;
 
   const GatchaScreen({Key? key, required this.socket}) : super(key: key);
 
+  @override
+  State<GatchaScreen> createState() => _GatchaScreenState();
+}
+
+class _GatchaScreenState extends State<GatchaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,9 +32,15 @@ class GatchaScreen extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 200.0),
-                    child: Text(
-                      "data",
-                      style: TextStyle(fontSize: 28, fontFamily: "Retro"),
+                    child: ChangeNotifierProvider.value(
+                      value: widget.socket,
+                      child: Consumer<ClientSocket>(
+                          builder: ((context, value, child) {
+                        return Text(
+                          value.loserStr,
+                          style: TextStyle(fontSize: 28, fontFamily: "Retro"),
+                        );
+                      })),
                     ),
                   ),
                   Padding(
@@ -47,7 +57,7 @@ class GatchaScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => PenaltyGatcha(
-                                      socket: socket,
+                                      socket: widget.socket,
                                     )));
                       },
                     ),
